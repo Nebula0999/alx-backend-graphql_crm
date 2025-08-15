@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django import DjangoObjectType
 from graphene import ObjectType, Field, String, List
 from crm.models import User, Booking
+from crm.schema import Query as CRMQuery, Mutation as CRMMutation
 
 
 class Query(ObjectType):
@@ -25,3 +26,10 @@ class UserType(DjangoObjectType):
         model = User
         fields = ("id", "username", "email", "first_name", "last_name")
         '''
+class Query(CRMQuery, graphene.ObjectType):
+    pass
+
+class Mutation(CRMMutation, graphene.ObjectType):
+    pass
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
