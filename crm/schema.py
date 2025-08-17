@@ -5,6 +5,8 @@ from .models import Customer, Product, Order
 import re
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+from .filters import CustomerFilter, ProductFilter, OrderFilter
+from graphene_django.filter import DjangoFilterConnectionField
 
 class CustomerType(DjangoObjectType):
     class Meta:
@@ -17,10 +19,7 @@ class ProductType(DjangoObjectType):
 class OrderType(DjangoObjectType):
     class Meta:
         model = Order
-class Query(graphene.ObjectType):
-    all_customers = graphene.List(CustomerType)
-    all_products = graphene.List(ProductType)
-    all_orders = graphene.List(OrderType)
+
 
 class CustomerInput(graphene.InputObjectType):
     name = graphene.String(required=True)
@@ -146,4 +145,33 @@ class Mutation(graphene.ObjectType):
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
 
+class Query(graphene.ObjectType):
+    all_customers = DjangoFilterConnectionField(CustomerType, filterset_class=CustomerFilter, order_by=graphene.List(of_type=graphene.String))
+    all_products = DjangoFilterConnectionField(ProductType, filterset_class=ProductFilter, order_by=graphene.List(of_type=graphene.String))
+    all_orders = DjangoFilterConnectionField(OrderType, filterset_class=OrderFilter, order_by=graphene.List(of_type=graphene.String))
+
+    # Order_by logic
+    def resolve_all_customers(self, info, **kwargs):
+        qs = Customer.objects.all()
+        order_by = kwargs.get("order_by")
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def resolve_all_products(self, info, **kwargs):
+        qs = Product.objects.all()
+        order_by = kwargs.get("order_by")
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def resolve_all_orders(self, info, **kwargs):
+        qs = Order.objects.all()
+        order_by = kwargs.get("order_by")
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+
 schema = graphene.Schema(query=Query, mutation=Mutation)
+
