@@ -1,7 +1,8 @@
 # crm/schema.py
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Customer, Product, Order
+from .models import Customer, Order
+from crm.models import Product
 import re
 from django.db import IntegrityError, transaction
 from django.utils import timezone
