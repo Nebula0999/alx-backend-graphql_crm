@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crm',  # Assuming 'crm' is your app name
     'django-filter',  # Optional, if you use Django Filter
     'django_crontab',  # Optional, if you use django-cron
+    'django_celery_beat',  # Optional, if you use django-celery-beat
 ]
 
 MIDDLEWARE = [
